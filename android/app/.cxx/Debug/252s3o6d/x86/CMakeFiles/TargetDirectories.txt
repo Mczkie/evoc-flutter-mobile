@@ -1,0 +1,2 @@
+C:/Users/MCMC/Desktop/evocapp/flutter/flutterapp-master/android/app/.cxx/Debug/252s3o6d/x86/CMakeFiles/edit_cache.dir
+C:/Users/MCMC/Desktop/evocapp/flutter/flutterapp-master/android/app/.cxx/Debug/252s3o6d/x86/CMakeFiles/rebuild_cache.dir
