@@ -1,12 +1,8 @@
 // ignore_for_file: unused_field, unnecessary_cast, unused_element
-
-import 'dart:convert';
-
-import 'package:evocapp/screens/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:evocapp/database/db_helper.dart';
 import 'package:evocapp/screens/startup.dart';
-import 'package:http/http.dart' as http;
+import 'package:evocapp/screens/eventDate.dart';
 
 class MyHome extends StatefulWidget {
   final String email;
@@ -146,20 +142,37 @@ class _MyHomeState extends State<MyHome> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: background,
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _buildHeroSection(),
-            const SizedBox(height: 24),
-            _buildSearchBar(),
-            const SizedBox(height: 24),
-            _buildCategoriesSection(),
-            const SizedBox(height: 24),
-            _buildEventsSection(),
-            const SizedBox(height: 24),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              _buildHeroSection(),
+              const SizedBox(height: 24),
+              // _buildSearchBar(),
+              const SizedBox(height: 24),
+              _buildCategoriesSection(),
+              const SizedBox(height: 24),
+
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Upcoming Events',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: textDark,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              CollectionSchedulePage(),
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -192,23 +205,6 @@ class _MyHomeState extends State<MyHome> {
           ],
         ),
       ),
-      actions: [
-        Container(
-          margin: const EdgeInsets.only(right: 16),
-          child: IconButton(
-            icon: const Icon(Icons.message, color: textDark),
-            onPressed: () {
-              // Handle message icon tap
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatPage(userId: widget.email),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
     );
   }
 
@@ -291,72 +287,69 @@ class _MyHomeState extends State<MyHome> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          color: cardColor,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: const TextField(
-          decoration: InputDecoration(
-            hintText: 'Search recycling tips...',
-            border: InputBorder.none,
-            icon: Icon(Icons.search, color: textLight),
-            suffixIcon: Icon(Icons.tune, color: textLight),
-          ),
-        ),
-      ),
-    );
-  }
+  // Widget _buildSearchBar() {
+  //   return Padding(
+  //     padding: const EdgeInsets.symmetric(horizontal: 24),
+  //     child: Container(
+  //       padding: const EdgeInsets.symmetric(horizontal: 16),
+  //       decoration: BoxDecoration(
+  //         color: cardColor,
+  //         borderRadius: BorderRadius.circular(12),
+  //         boxShadow: [
+  //           BoxShadow(
+  //             color: Colors.black.withOpacity(0.05),
+  //             blurRadius: 10,
+  //             offset: const Offset(0, 5),
+  //           ),
+  //         ],
+  //       ),
+  //       child: const TextField(
+  //         decoration: InputDecoration(
+  //           hintText: 'Search recycling tips...',
+  //           border: InputBorder.none,
+  //           icon: Icon(Icons.search, color: textLight),
+  //           suffixIcon: Icon(Icons.tune, color: textLight),
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildCategoriesSection() {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Recycling Categories',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: textDark,
-                ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Recycling Categories',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: textDark,
               ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => AllCategoriesScreen(
-                        categories: recyclingItems,
-                        categoryColors: categoryColors,
-                      ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AllCategoriesScreen(
+                      categories: recyclingItems,
+                      categoryColors: categoryColors,
                     ),
-                  );
-                },
-                child: const Text(
-                  'See All',
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontWeight: FontWeight.bold,
                   ),
+                );
+              },
+              child: const Text(
+                'See All',
+                style: TextStyle(
+                  color: primaryColor,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         const SizedBox(height: 12),
         SizedBox(
@@ -382,7 +375,7 @@ class _MyHomeState extends State<MyHome> {
     return GestureDetector(
       onTap: () => _showCategoryDetails(item),
       child: Container(
-        width: 180,
+        width: 200,
         margin: const EdgeInsets.only(right: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -463,356 +456,6 @@ class _MyHomeState extends State<MyHome> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildEventsSection() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Upcoming Events',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: textDark,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 12),
-        _buildEventsContainer(),
-      ],
-    );
-  }
-
-  Widget _buildEventsContainer() {
-    return FutureBuilder<List<Map<String, dynamic>>>(
-      future: fetchCollectionSchedules(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        }
-
-        final schedules = snapshot.data ?? [];
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Container(
-            decoration: BoxDecoration(
-              color: cardColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                InkWell(
-                  onTap:
-                      _showFullCollectionSchedule, // Added click handler here
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      children: [
-                        Icon(Icons.event, color: primaryColor),
-                        const SizedBox(width: 8),
-                        const Text(
-                          'Collection Schedule',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: textDark,
-                          ),
-                        ),
-                        const Spacer(),
-                        Icon(Icons.chevron_right, color: textLight),
-                      ],
-                    ),
-                  ),
-                ),
-                const Divider(height: 1),
-                SizedBox(
-                  height: 150,
-                  child: schedules.isEmpty
-                      ? _buildEmptyEvents()
-                      : ListView.builder(
-                          padding: EdgeInsets.zero,
-                          itemCount: schedules.length,
-                          itemBuilder: (context, index) =>
-                              _buildScheduleItem(schedules[index]),
-                        ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-// New method to show full collection schedule
-  void _showFullCollectionSchedule() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.85,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Full Collection Schedule',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: FutureBuilder<List<Map<String, dynamic>>>(
-                future: fetchCollectionSchedules(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-
-                  final schedules = snapshot.data ?? [];
-
-                  return ListView.builder(
-                    itemCount: schedules.length,
-                    itemBuilder: (context, index) => Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              schedules[index]['description'] ?? 'Collection',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Icon(Icons.calendar_today,
-                                    size: 16, color: textLight),
-                                const SizedBox(width: 4),
-                                Text(
-                                  _formatScheduleDate(schedules[index]['date']),
-                                  style: TextStyle(color: textLight),
-                                ),
-                                const SizedBox(width: 16),
-                                Icon(Icons.access_time,
-                                    size: 16, color: textLight),
-                                const SizedBox(width: 4),
-                                Text(
-                                  _formatScheduleTime(schedules[index]['date']),
-                                  style: TextStyle(color: textLight),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-// Helper methods for date formatting
-  String _formatScheduleDate(String dateString) {
-    final date = DateTime.parse(dateString);
-    return '${_getMonthAbbreviation(date.month)} ${date.day}, ${date.year}';
-  }
-
-  String _formatScheduleTime(String dateString) {
-    final date = DateTime.parse(dateString);
-    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
-  }
-
-  Future<List<Map<String, dynamic>>> fetchCollectionSchedules() async {
-    try {
-      // Replace 192.168.1.X with your computer's local IP address
-      final response = await http.get(
-        Uri.parse('http://192.168.1.249:5000/api/collection'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = jsonDecode(response.body);
-        return data.cast<Map<String, dynamic>>();
-      } else {
-        throw Exception('Failed to load schedules');
-      }
-    } catch (e) {
-      throw Exception('Network error: $e');
-    }
-  }
-
-  Widget _buildScheduleItem(Map<String, dynamic> schedule) {
-    final DateTime scheduleDate = DateTime.parse(schedule['date']);
-
-    return ListTile(
-      leading: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              scheduleDate.day.toString(),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
-              ),
-            ),
-            Text(
-              _getMonthAbbreviation(scheduleDate.month),
-              style: TextStyle(
-                fontSize: 12,
-                color: primaryColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-      title: Text(
-        schedule['location'] ?? 'Collection Schedule',
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: textDark,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Text(
-        schedule['date'] ?? 'Collection',
-        style: const TextStyle(
-          fontSize: 12,
-          color: textLight,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEventItem(int index) {
-    final date = _eventDates.keys.elementAt(index);
-    final description = _eventDates[date]!;
-
-    return ListTile(
-      leading: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          color: primaryColor.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              date.day.toString(),
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
-              ),
-            ),
-            Text(
-              _getMonthAbbreviation(date.month),
-              style: TextStyle(
-                fontSize: 12,
-                color: primaryColor,
-              ),
-            ),
-          ],
-        ),
-      ),
-      title: Text(
-        description,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-          color: textDark,
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-      subtitle: Text(
-        _getFormattedTime(date),
-        style: const TextStyle(
-          fontSize: 12,
-          color: textLight,
-        ),
-      ),
-      trailing: IconButton(
-        icon: Icon(Icons.delete, color: Colors.red[300]),
-        onPressed: () => _confirmDeleteEvent(date),
-      ),
-    );
-  }
-
-  Widget _buildEmptyEvents() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.event_note, size: 40, color: textLight),
-          const SizedBox(height: 8),
-          const Text(
-            'No upcoming events',
-            style: TextStyle(color: textLight),
-          ),
-        ],
       ),
     );
   }
@@ -902,107 +545,6 @@ class _MyHomeState extends State<MyHome> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Future<void> _confirmDeleteEvent(DateTime date) async {
-    final shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Event'),
-        content: const Text('Are you sure you want to delete this event?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (shouldDelete == true) {
-      await _dbHelper.deleteReportsByDate(date);
-      _loadEventDates();
-    }
-  }
-
-  void _showEventsSummary() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Your Recycling Schedule',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: textDark,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _eventDates.isEmpty
-                  ? _buildEmptyEventsDialog()
-                  : _buildEventsList(),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Close'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyEventsDialog() {
-    return const Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          Icon(Icons.event_note, size: 48, color: textLight),
-          SizedBox(height: 16),
-          Text(
-            'No events scheduled yet',
-            style: TextStyle(color: textLight),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEventsList() {
-    return Container(
-      constraints: const BoxConstraints(maxHeight: 300),
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: _eventDates.length,
-        itemBuilder: (context, index) => Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: _buildEventSummaryItem(index),
         ),
       ),
     );

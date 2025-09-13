@@ -5,9 +5,14 @@ void main() {
   runApp(const MyInformation());
 }
 
-class MyInformation extends StatelessWidget {
+class MyInformation extends StatefulWidget {
   const MyInformation({super.key});
 
+  @override
+  State<MyInformation> createState() => _MyInformationState();
+}
+
+class _MyInformationState extends State<MyInformation> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -1,13 +1,19 @@
 import 'package:evocapp/l10n/app_localization.dart';
-import 'package:evocapp/menu.dart';
+
 import 'package:evocapp/providers/localeProvider.dart';
+import 'package:evocapp/screens/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class MyLanguage extends StatelessWidget {
+class MyLanguage extends StatefulWidget {
   const MyLanguage({super.key});
 
+  @override
+  State<MyLanguage> createState() => _MyLanguageState();
+}
+
+class _MyLanguageState extends State<MyLanguage> {
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -22,7 +28,7 @@ class MyLanguage extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => MyMenu(email: 'email'))),
+              MaterialPageRoute(builder: (context) => MyHomePage(email: ''))),
         ),
       ),
       body: Container(

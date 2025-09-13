@@ -1,7 +1,7 @@
 import 'package:evocapp/menu.dart';
 import 'package:evocapp/screens/home.dart';
 // import 'package:evocapp/screens/loginpage.dart';
-import 'package:evocapp/screens/reports.dart';
+import 'package:evocapp/screens/announcement.dart';
 import 'package:evocapp/screens/tips.dart';
 import 'package:evocapp/screens/scanner.dart';
 import 'package:flutter/material.dart';

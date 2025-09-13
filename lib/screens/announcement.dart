@@ -13,7 +13,8 @@ class _AnnouncementPageState extends State<MyAnnouncement> {
   List<Map<String, dynamic>> _announcements = [];
   bool _isLoading = false;
 
-  final String _baseUrl = 'http://192.168.1.249:5000/api/announcement';
+  // ⚠️ Change localhost if testing on real device (use your PC’s IP)
+  final String _baseUrl = 'http://localhost:5001/api/announcement';
 
   @override
   void initState() {
@@ -45,13 +46,18 @@ class _AnnouncementPageState extends State<MyAnnouncement> {
   }
 
   String _formatDate(String dateString) {
-    final date = DateTime.parse(dateString);
-    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    try {
+      final date = DateTime.parse(dateString);
+      return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    } catch (_) {
+      return "Invalid date";
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text('Announcements'),
@@ -90,7 +96,7 @@ class _AnnouncementPageState extends State<MyAnnouncement> {
                                 child: ListTile(
                                   contentPadding: const EdgeInsets.all(16),
                                   title: Text(
-                                    announcement['title'],
+                                    announcement['title'] ?? 'No title',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -102,13 +108,15 @@ class _AnnouncementPageState extends State<MyAnnouncement> {
                                     children: [
                                       const SizedBox(height: 8),
                                       Text(
-                                          announcement['content']?.toString() ??
-                                              'No content'),
+                                        announcement['description']
+                                                ?.toString() ??
+                                            'No description',
+                                      ),
                                       const SizedBox(height: 8),
                                       Text(
-                                        announcement['postedAt'] != null
+                                        announcement['time_stamp'] != null
                                             ? _formatDate(
-                                                announcement['postedAt'])
+                                                announcement['time_stamp'])
                                             : 'Date not available',
                                         style: const TextStyle(
                                           fontSize: 12,

@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyTips extends StatelessWidget {
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   const MyTips({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text(
@@ -79,15 +88,6 @@ class MyTips extends StatelessWidget {
                                   color: Colors.white.withOpacity(0.9),
                                 ),
                               ),
-                              const SizedBox(height: 16),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -105,7 +105,7 @@ class MyTips extends StatelessWidget {
                       Icon(Icons.article, color: Colors.teal[700], size: 24),
                       const SizedBox(width: 8),
                       Text(
-                        'LEARNING ARTICLES',
+                        'WASTE SEGREGATION ARTICLES',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -121,6 +121,7 @@ class MyTips extends StatelessWidget {
                 // Policy Card (Different style to highlight importance)
                 _buildPolicyCard(
                   "DM No. 268, s. 2023 – STRICT IMPLEMENTATION OF NO SEGREGATION, NO COLLECTION OF GARBAGE POLICY WITHIN OLONGAPO CITY",
+                  "https://deped-olongapo.com/dm-no-268-s-2023-strict-emplementation-of-no-segregation-no-collection-of-garbage-policy-within-olongapo-city/",
                 ),
 
                 // Tips List
@@ -129,59 +130,54 @@ class MyTips extends StatelessWidget {
                   "Segregation Basics",
                   "Separate waste into biodegradable, non-biodegradable, and hazardous categories for efficient recycling.",
                   Colors.orange[700]!,
+                  "https://www.youtube.com/watch?v=Qyu-fZ8BOnI",
                 ),
                 _buildTipCard(
                   Icons.label,
                   "Clear Labeling",
                   "Use separate bins with clear labels to help everyone in your household dispose waste properly.",
                   Colors.blue[700]!,
+                  "https://www.youtube.com/watch?v=VQTtg3KgVv4",
                 ),
                 _buildTipCard(
-                  Icons.clean_hands,
-                  "Clean Before Disposal",
-                  "Rinse plastic and glass containers before disposal to prevent contamination of recyclables.",
-                  Colors.green[700]!,
-                ),
+                    Icons.clean_hands,
+                    "Clean Before Disposal",
+                    "Rinse plastic and glass containers before disposal to prevent contamination of recyclables.",
+                    Colors.green[700]!,
+                    "https://www.youtube.com/watch?v=IisgnbMfKvI"),
                 _buildTipCard(
-                  Icons.eco,
-                  "Compost Organics",
-                  "Compost food scraps and organic waste to reduce landfill waste and create nutrient-rich soil.",
-                  Colors.brown[700]!,
-                ),
+                    Icons.eco,
+                    "Compost Organics",
+                    "Compost food scraps and organic waste to reduce landfill waste and create nutrient-rich soil.",
+                    Colors.brown[700]!,
+                    "https://www.youtube.com/watch?v=Z8eYd7k2r0g"),
                 _buildTipCard(
-                  Icons.shopping_bag,
-                  "Reduce Plastics",
-                  "Avoid single-use plastics by opting for reusable bags, bottles, and containers.",
-                  Colors.purple[700]!,
-                ),
+                    Icons.shopping_bag,
+                    "Reduce Plastics",
+                    "Avoid single-use plastics by opting for reusable bags, bottles, and containers.",
+                    Colors.purple[700]!,
+                    "https://www.youtube.com/watch?v=HQT5kNw3n9A"),
                 _buildTipCard(
-                  Icons.warning,
-                  "Hazardous Waste",
-                  "Dispose of batteries and chemicals at designated centers to prevent environmental harm.",
-                  Colors.red[700]!,
-                ),
+                    Icons.warning,
+                    "Hazardous Waste",
+                    "Dispose of batteries and chemicals at designated centers to prevent environmental harm.",
+                    Colors.red[700]!,
+                    "https://www.youtube.com/watch?v=YcQ8g9bXGmA"),
                 _buildTipCard(
-                  Icons.school,
-                  "Community Education",
-                  "Educate your family and community about the importance of waste segregation.",
-                  Colors.indigo[700]!,
-                ),
+                    Icons.school,
+                    "Community Education",
+                    "Educate your family and community about the importance of waste segregation.",
+                    Colors.indigo[700]!,
+                    "https://www.youtube.com/watch?v=Z5bYkXkQmXU"),
               ],
             ),
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Add functionality for the FAB
-        },
-        backgroundColor: Colors.teal[700],
-        child: const Icon(Icons.qr_code_scanner, color: Colors.white),
-      ),
     );
   }
 
-  Widget _buildPolicyCard(String text) {
+  Widget _buildPolicyCard(String text, String url) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(
@@ -192,17 +188,35 @@ class MyTips extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(Icons.gavel, size: 32, color: Colors.teal[700]),
             const SizedBox(width: 16),
             Expanded(
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey[800],
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    text,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: () => _launchURL(url),
+                    child: Text(
+                      url,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.blue[700],
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -211,8 +225,8 @@ class MyTips extends StatelessWidget {
     );
   }
 
-  Widget _buildTipCard(
-      IconData icon, String title, String description, Color color) {
+  Widget _buildTipCard(IconData icon, String title, String description,
+      Color color, String? url) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
@@ -222,7 +236,9 @@ class MyTips extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
-          // Handle tap
+          if (url != null) {
+            _launchURL(url);
+          }
         },
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -260,6 +276,16 @@ class MyTips extends StatelessWidget {
                         height: 1.4,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                    if (url != null)
+                      Text(
+                        "Link: $url",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.blue[700],
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
                   ],
                 ),
               ),

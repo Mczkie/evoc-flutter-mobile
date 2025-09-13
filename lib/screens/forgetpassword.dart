@@ -1,22 +1,16 @@
+import 'package:evocapp/database/db_helper.dart';
 import 'package:evocapp/screens/loginpage.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart'; // For toast messages
-
-void main() {
-  runApp(const MyForget());
-}
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MyForget extends StatelessWidget {
   const MyForget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const ForgotPasswordScreen(),
+      home: ForgotPasswordScreen(),
     );
   }
 }
@@ -29,36 +23,67 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _formKey = GlobalKey<FormState>(); // Form key for validation
-  final _emailController =
-      TextEditingController(); // Controller for email input
-  bool _isLoading = false; // Loading state for the UI
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  bool _isLoading = false;
 
-  // Function to simulate sending a password reset email
-  void _resetPassword() {
+  final DbHelper _dbHelper = DbHelper();
+
+  // ✅ Password Validation Function
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return "Enter a password";
+    if (value.length < 6) return "Password must be at least 6 characters";
+    if (!RegExp(r'[A-Z]').hasMatch(value))
+      return "Must contain an uppercase letter";
+    if (!RegExp(r'[0-9]').hasMatch(value)) return "Must contain a number";
+    if (!RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(value)) {
+      return "Must contain a special character (!@#\$ etc.)";
+    }
+    return null;
+  }
+
+  Future<void> _resetPassword() async {
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true; // Show loading indicator
-      });
+      setState(() => _isLoading = true);
 
-      // Simulate a password reset process
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _isLoading = false; // Hide loading indicator
-        });
+      final email = _emailController.text.trim();
+      final newPassword = _newPasswordController.text.trim();
 
-        // Simulate sending a password reset email
+      try {
+        final user = await _dbHelper.getUser(email);
+
+        if (user != null) {
+          await _dbHelper.updatePassword(email, newPassword);
+
+          Fluttertoast.showToast(
+            msg: "Password updated successfully!",
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const MyLoginPage(email: ""),
+            ),
+          );
+        } else {
+          Fluttertoast.showToast(
+            msg: "Email not found!",
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        }
+      } catch (e) {
         Fluttertoast.showToast(
-          msg: "Password reset email sent to ${_emailController.text}",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          backgroundColor: Colors.green,
+          msg: "Error: $e",
+          backgroundColor: Colors.red,
           textColor: Colors.white,
         );
-
-        // Clear the email field after submission
-        _emailController.clear();
-      });
+      } finally {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -88,7 +113,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Title
                       const Text(
                         "Forgot Password",
                         style: TextStyle(
@@ -98,89 +122,52 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Subtitle
-                      const Text(
-                        "Enter your email address to reset your password.",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Email Input Field
                       TextFormField(
                         controller: _emailController,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: "Email",
-                          prefixIcon: const Icon(Icons.email),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
+                          prefixIcon: Icon(Icons.email),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter your email";
-                          }
-                          if (!RegExp(
-                                  r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-                              .hasMatch(value)) {
-                            return "Please enter a valid email";
-                          }
-                          return null;
-                        },
+                        validator: (value) => value == null || value.isEmpty
+                            ? "Enter your email"
+                            : null,
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _newPasswordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: "New Password",
+                          prefixIcon: Icon(Icons.lock),
+                        ),
+                        validator: _validatePassword, // ✅ Using validation
                       ),
                       const SizedBox(height: 24),
-
-                      // Reset Password Button
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: _isLoading
-                              ? null
-                              : _resetPassword, // Disable button while loading
+                          onPressed: _isLoading ? null : _resetPassword,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue,
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
                           ),
                           child: _isLoading
                               ? const CircularProgressIndicator(
                                   color: Colors.white,
                                 )
-                              : const Text(
-                                  "Reset Password",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                              : const Text("Update Password"),
                         ),
                       ),
-                      const SizedBox(height: 16),
-
-                      // Back to Login Link
                       TextButton(
                         onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const MyLoginPage(
-                                        email: "",
-                                      ))); // Go back to the login screen
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const MyLoginPage(email: ""),
+                            ),
+                          );
                         },
-                        child: const Text(
-                          "Back to Login",
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.blue,
-                          ),
-                        ),
+                        child: const Text("Back to Login"),
                       ),
                     ],
                   ),

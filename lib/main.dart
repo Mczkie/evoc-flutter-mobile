@@ -1,51 +1,52 @@
-import 'package:evocapp/l10n/app_localization.dart';
 import 'package:evocapp/providers/localeProvider.dart';
+import 'package:evocapp/screens/loginpage.dart';
+import 'package:evocapp/screens/startup.dart';
+import 'package:evocapp/screens/home_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart'; // Add this import
-import 'package:provider/provider.dart'; // Add this import
-import 'package:evocapp/services/sync_user.dart';
-
-import 'screens/startup.dart';
-import 'screens/home_page.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  const String email = '';
   runApp(
     ChangeNotifierProvider(
-      create: (_) => LocaleProvider(), // Provide the LocaleProvider
-      child: const MyApp(email: email),
+      create: (_) => LocaleProvider(),
+      child: const MyApp(),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  final String email;
-  const MyApp({super.key, required this.email});
+  const MyApp({super.key});
+
+  Future<bool> isLoggedIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('isLoggedIn') ?? false;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final localeProvider = Provider.of<LocaleProvider>(context);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      locale: localeProvider.locale, // Use the selected locale
-      localizationsDelegates: const [
-        AppLocalizations.delegate, // Generated localization delegate
-        GlobalMaterialLocalizations.delegate, // Material localization
-        GlobalWidgetsLocalizations.delegate, // Widgets localization
-        GlobalCupertinoLocalizations.delegate, // Cupertino localization
-      ],
-      supportedLocales: const [
-        Locale('en'), // English
-        Locale('es'), // Spanish
-        Locale('fr'), // French
-        Locale('de'), // German
-      ],
-      home: MyStartup(email: email),
+      home: FutureBuilder<bool>(
+        future: isLoggedIn(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          } else if (snapshot.hasData && snapshot.data == true) {
+            return const MyHomePage(email: '');
+          } else {
+            return const MyLoginPage(email: '');
+          }
+        },
+      ),
       routes: {
-        '/homepage': (context) => MyHomePage(email: email),
+        '/homepage': (context) => const MyHomePage(email: ''),
+        '/login': (context) => const MyLoginPage(email: ''),
+        '/startup': (context) => const MyStartup(email: ''),
       },
     );
   }

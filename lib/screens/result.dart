@@ -1,21 +1,35 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class MyResult extends StatelessWidget {
+class MyResult extends StatefulWidget {
   final File image;
   final String result;
   final String objectType;
 
   const MyResult({
-    super.key,
+    Key? key,
     required this.image,
     required this.result,
     required this.objectType,
-  });
+  }) : super(key: key);
+
+  @override
+  State<MyResult> createState() => _MyResultState();
+}
+
+class _MyResultState extends State<MyResult> {
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -38,7 +52,17 @@ class MyResult extends StatelessWidget {
                     _buildImagePreview(),
                     const SizedBox(height: 32),
                     _buildResultCard(),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 24),
+                    // Display analytics info on screen
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     _buildActionButton(context),
                   ],
                 ),
@@ -88,7 +112,7 @@ class MyResult extends StatelessWidget {
 
   Widget _buildImagePreview() {
     return FutureBuilder<File>(
-      future: Future.value(image),
+      future: Future.value(widget.image),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return _buildImagePlaceholder();
@@ -176,10 +200,40 @@ class MyResult extends StatelessWidget {
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // keep text aligned left
         children: [
-          _buildResultItem('Category', result),
           const SizedBox(height: 16),
-          _buildResultItem('Waste Type', objectType),
+          _buildResultItem('Waste Type', widget.objectType),
+
+          const SizedBox(height: 16),
+
+          // 👇 Show clickable link depending on object type
+          if (widget.objectType.toLowerCase() == 'biodegradable')
+            GestureDetector(
+              onTap: () => _launchURL(
+                  'https://www.youtube.com/watch?v=VIDEO_ID_FOR_BIO'),
+              child: const Text(
+                "Learn more about Biodegradable Waste",
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 16,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            )
+          else if (widget.objectType.toLowerCase() == 'non-biodegradable')
+            GestureDetector(
+              onTap: () => _launchURL(
+                  'https://www.youtube.com/watch?v=VIDEO_ID_FOR_NONBIO'),
+              child: const Text(
+                "Learn more about Non-Biodegradable Waste",
+                style: TextStyle(
+                  color: Colors.blue,
+                  fontSize: 16,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -211,12 +265,12 @@ class MyResult extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: _getTypeColor(objectType).withOpacity(0.1),
+            color: _getTypeColor(widget.objectType).withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
-            _getTypeIcon(objectType),
-            color: _getTypeColor(objectType),
+            _getTypeIcon(widget.objectType),
+            color: _getTypeColor(widget.objectType),
             size: 24,
           ),
         ),

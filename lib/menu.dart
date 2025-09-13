@@ -1,7 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:evocapp/screens/menu_pages/faqs.dart';
-import 'package:evocapp/screens/menu_pages/language_settings.dart';
 import 'package:evocapp/screens/menu_pages/legal_information.dart';
 import 'package:evocapp/screens/menu_pages/notificatinSettings.dart';
 import 'package:evocapp/screens/menu_pages/privacySettingsPage.dart';
@@ -25,7 +24,6 @@ class MyMenu extends StatelessWidget {
         children: [
           _buildMenuItem(context, "Privacy Settings", MyPrivacy()),
           _buildMenuItem(context, "Notification Settings", MyNotificationS()),
-          _buildMenuItem(context, "Language Settings", MyLanguage()),
           _buildMenuItem(context, "FAQS", MyFAQS()),
           _buildMenuItem(context, "Legal Information", MyInformation()),
           const ListTile(
@@ -48,7 +46,8 @@ class MyMenu extends StatelessWidget {
               ),
               child: const Text(
                 'Logout',
-                style: TextStyle(fontSize: 16), // Text style
+                style:
+                    TextStyle(fontSize: 16, color: Colors.white), // Text style
               ),
             ),
           ),

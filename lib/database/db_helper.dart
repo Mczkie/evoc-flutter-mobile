@@ -128,4 +128,17 @@ class DbHelper {
     final db = await database;
     await db.delete('reports', where: 'id = ?', whereArgs: [id]);
   }
+
+  // reset password
+  Future<int> updatePassword(String email, String newPassword) async {
+    final db = await database;
+
+    // Update the password where email matches
+    return await db.update(
+      'users', // make sure this matches your table name
+      {'password': newPassword},
+      where: 'email = ?',
+      whereArgs: [email],
+    );
+  }
 }

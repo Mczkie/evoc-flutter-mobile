@@ -1,7 +1,9 @@
-import 'package:evocapp/screens/loginJS.dart';
+import 'package:evocapp/screens/loginpage.dart';
+import 'package:evocapp/screens/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MyStartup extends StatefulWidget {
   final String email;
@@ -12,14 +14,49 @@ class MyStartup extends StatefulWidget {
 }
 
 class _MyStartupState extends State<MyStartup> {
+  bool _loading = true;
+  bool _isLoggedIn = false;
+  String _email = '';
+
   @override
   void initState() {
     super.initState();
+    _checkLogin();
+  }
+
+  Future<void> _checkLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool loggedIn = prefs.getBool('isLoggedIn') ?? false;
+    String? email = prefs.getString('email');
+
+    setState(() {
+      _isLoggedIn = loggedIn;
+      _email = email ?? '';
+      _loading = false;
+    });
+
+    // If already logged in, go to home page
+    if (_isLoggedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyHomePage(email: _email),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    // Show onboarding only if not logged in
     return IntroductionScreen(
+      resizeToAvoidBottomInset: true,
       globalBackgroundColor: Colors.white10,
       pages: [
         PageViewModel(
@@ -55,7 +92,9 @@ class _MyStartupState extends State<MyStartup> {
       ],
       onDone: () {
         Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => RegisterPage()),
+          MaterialPageRoute(
+            builder: (context) => MyLoginPage(email: ''),
+          ),
         );
       },
       showSkipButton: true,

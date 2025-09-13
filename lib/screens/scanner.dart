@@ -22,6 +22,24 @@ class _MyScannerState extends State<MyScanner> {
   late tfl.Interpreter? _interpreter;
   final picker = ImagePicker();
 
+  List<String> biowaste = [
+    'Food wast',
+    'Garden/Plant waste',
+    'Paper waste',
+    'Agricultural waste',
+    'Animal waste',
+    'Wood Products',
+    'Biodegradable plastics'
+  ];
+
+  List<String> nonbiowaste = [
+    'Plastic',
+    'Metal',
+    'Glass',
+    'E-waste',
+    'Synthetic fabric'
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -47,6 +65,7 @@ class _MyScannerState extends State<MyScanner> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -176,12 +195,60 @@ class _MyScannerState extends State<MyScanner> {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  Text('Supported categories: 6 waste types',
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      )),
+                  Center(
+                    child: Column(
+                      children: [
+                        Text('Supported categories: 6 waste types',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            )),
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Text("Waste List"),
+                                    content: SizedBox(
+                                      height: 150,
+                                      child: Center(
+                                          child: Column(
+                                        children: [
+                                          Text('Biodegradable'),
+                                          Text(biowaste.toString()),
+                                          const SizedBox(height: 10),
+                                          Text('Non-Biodegradable'),
+                                          Text(nonbiowaste.toString()),
+                                        ],
+                                      )),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text("Close"),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      )
+                                    ],
+                                  );
+                                });
+                          },
+                          child: ClipRect(
+                            child: Text(
+                              'View',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
                 ],
               ),
             ),
@@ -328,8 +395,6 @@ class _MyScannerState extends State<MyScanner> {
       case 'paper':
       case 'cardboard':
         return 'Biodegradable';
-      case 'trash':
-        return 'General Waste';
       default:
         return 'Unknown';
     }
