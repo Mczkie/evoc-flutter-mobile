@@ -5,6 +5,8 @@ import 'package:evocapp/screens/loginpage.dart';
 import 'package:evocapp/database/db_helper.dart';
 import 'package:evocapp/utils/validators.dart';
 import 'package:lottie/lottie.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MySignUpPage extends StatefulWidget {
   final String email;
@@ -29,19 +31,16 @@ class _MySignUpPageState extends State<MySignUpPage> {
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
-    // Validate password first
     final passwordError = PasswordValidator.validate(password);
     if (passwordError != null) {
-      setState(() {
-        _passwordError = passwordError;
-      });
+      setState(() => _passwordError = passwordError);
       return;
     }
 
     if (name.isEmpty || email.isEmpty) {
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (_) => AlertDialog(
           title: const Text('Error'),
           content: const Text('Name and Email are required fields'),
           actions: [
@@ -55,42 +54,58 @@ class _MySignUpPageState extends State<MySignUpPage> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-      _passwordError = null;
-    });
+    setState(() => _isLoading = true);
 
     try {
+      // Save locally
       await _dbHelper.insertUser(name, email, password);
 
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Success'),
-          content: const Text('User registration successful!'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(
-                    builder: (context) => MyLoginPage(email: email),
-                  ),
-                );
-              },
-              child: const Text('Ok'),
-            ),
-          ],
-        ),
+      // Send user to Node backend
+      final response = await http.post(
+        Uri.parse("https://evoc-backend-jkly.onrender.com/api/mobileuser"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "name": name,
+          "email": email,
+          "password": password,
+        }),
       );
+
+      if (response.statusCode == 201) {
+        // Success
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Success'),
+            content: const Text('User registration successful!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                        builder: (_) => MyLoginPage(email: email)),
+                  );
+                },
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        // Failed to save online
+        final body = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Failed to register online: ${body['message']}')),
+        );
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error registering user: $e')),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 

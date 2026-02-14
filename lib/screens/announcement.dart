@@ -13,7 +13,7 @@ class _AnnouncementPageState extends State<MyAnnouncement> {
   List<Map<String, dynamic>> _announcements = [];
   bool _isLoading = false;
 
-  // ⚠️ Change localhost if testing on real device (use your PC’s IP)
+  // ⚠️ Change this when testing on real device (use your PC’s IP instead of localhost)
   final String _baseUrl = 'http://localhost:5001/api/announcement';
 
   @override
@@ -48,7 +48,7 @@ class _AnnouncementPageState extends State<MyAnnouncement> {
   String _formatDate(String dateString) {
     try {
       final date = DateTime.parse(dateString);
-      return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+      return '${date.day}/${date.month}/${date.year} • ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
     } catch (_) {
       return "Invalid date";
     }
@@ -57,87 +57,118 @@ class _AnnouncementPageState extends State<MyAnnouncement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF4F9F4), // light eco background
       appBar: AppBar(
-        title: const Text('Announcements'),
-        backgroundColor: Colors.green,
-        elevation: 5,
+        title: const Text(
+          'Announcements',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.green.shade700,
+        elevation: 4,
+        centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: _announcements.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'No announcements yet',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey,
+          ? const Center(child: CircularProgressIndicator(color: Colors.green))
+          : RefreshIndicator(
+              onRefresh: _fetchAnnouncements,
+              color: Colors.green,
+              child: _announcements.isEmpty
+                  ? const Center(
+                      child: Text(
+                        '🌱 No announcements yet',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _announcements.length,
+                      itemBuilder: (context, index) {
+                        final announcement = _announcements[index];
+                        return Card(
+                          elevation: 6,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.green.shade50,
+                                  Colors.white,
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                               ),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                          )
-                        : ListView.builder(
-                            itemCount: _announcements.length,
-                            itemBuilder: (context, index) {
-                              final announcement = _announcements[index];
-                              return Card(
-                                elevation: 3,
-                                margin: const EdgeInsets.symmetric(vertical: 8),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.all(16),
-                                  title: Text(
-                                    announcement['title'] ?? 'No title',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.green.shade100,
+                                      child: const Icon(Icons.campaign,
+                                          color: Colors.green),
                                     ),
-                                  ),
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        announcement['description']
-                                                ?.toString() ??
-                                            'No description',
-                                      ),
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        announcement['time_stamp'] != null
-                                            ? _formatDate(
-                                                announcement['time_stamp'])
-                                            : 'Date not available',
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        announcement['title'] ?? 'No title',
                                         style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.grey,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
                                         ),
                                       ),
-                                    ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Text(
+                                  announcement['description']?.toString() ??
+                                      'No description',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    height: 1.4,
+                                    color: Colors.black87,
                                   ),
                                 ),
-                              );
-                            },
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.access_time,
+                                        size: 16, color: Colors.grey),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      announcement['time_stamp'] != null
+                                          ? _formatDate(
+                                              announcement['time_stamp'])
+                                          : 'Date not available',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                  ),
-                ],
-              ),
+                        );
+                      },
+                    ),
             ),
     );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 }

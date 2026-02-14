@@ -9,44 +9,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final prefs = await SharedPreferences.getInstance();
+  final isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
   runApp(
     ChangeNotifierProvider(
       create: (_) => LocaleProvider(),
-      child: const MyApp(),
+      child: MyApp(isLoggedIn: isLoggedIn),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  Future<bool> isLoggedIn() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('isLoggedIn') ?? false;
-  }
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FutureBuilder<bool>(
-        future: isLoggedIn(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          } else if (snapshot.hasData && snapshot.data == true) {
-            return const MyHomePage(email: '');
-          } else {
-            return const MyLoginPage(email: '');
-          }
-        },
-      ),
+      home:
+          isLoggedIn ? const MyHomePage(email: '') : const MyStartup(email: ''),
       routes: {
+        '/startup': (context) => const MyStartup(email: ''),
         '/homepage': (context) => const MyHomePage(email: ''),
         '/login': (context) => const MyLoginPage(email: ''),
-        '/startup': (context) => const MyStartup(email: ''),
       },
     );
   }

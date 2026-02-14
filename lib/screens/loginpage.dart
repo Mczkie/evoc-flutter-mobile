@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:evocapp/screens/forgetpassword.dart';
+// import 'package:evocapp/screens/forgetpassword.dart';
 import 'package:evocapp/screens/home_page.dart';
 import 'package:evocapp/screens/signuppage.dart';
 import 'package:evocapp/components/logtext.dart';
@@ -7,6 +7,10 @@ import 'package:evocapp/components/textfield.dart';
 import 'package:evocapp/database/db_helper.dart';
 import 'package:evocapp/utils/validators.dart';
 import 'package:lottie/lottie.dart';
+
+// NEW
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class MyLoginPage extends StatefulWidget {
   final String email;
@@ -24,6 +28,32 @@ class _MyLoginPageState extends State<MyLoginPage> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _passwordError;
+
+  // ---------------- ONLINE LOGIN FUNCTION ----------------
+  Future<Map<String, dynamic>?> loginOnline(
+      String email, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+            "https://evoc-backend-jkly.onrender.com/api/login"), // CHANGE IP
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "email": email,
+          "password": password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return null;
+      }
+    } catch (e) {
+      // no internet / server down
+      return null;
+    }
+  }
+  // --------------------------------------------------------
 
   Future<void> _login() async {
     final passwordError = PasswordValidator.validate(passwordController.text);
@@ -43,9 +73,25 @@ class _MyLoginPageState extends State<MyLoginPage> {
     final password = passwordController.text;
 
     try {
+      // -------- TRY ONLINE FIRST --------
+      final onlineUser = await loginOnline(email, password);
+
+      if (onlineUser != null) {
+        await _dbHelper.updatedLoginStatus(email, 1);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage(email: email)),
+        );
+        return;
+      }
+
+      // -------- OFFLINE FALLBACK --------
       final user = await _dbHelper.getUser(email);
+
       if (user != null && user['password'] == password) {
         await _dbHelper.updatedLoginStatus(email, 1);
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => MyHomePage(email: email)),
@@ -85,167 +131,119 @@ class _MyLoginPageState extends State<MyLoginPage> {
                 : SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        children: [
-                          Lottie.asset(
-                            "assets/login.json",
-                            height: 200,
+                      child: Column(children: [
+                        Lottie.asset("assets/login.json", height: 200),
+                        const SizedBox(height: 20),
+                        const Text(
+                          "Login into your account",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "Login into your account",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Welcome! Please enter your details.',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.white,
                           ),
-                          const SizedBox(height: 10),
-                          const Text(
-                            'Welcome! Please enter your details.',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 50),
-                          MyTextField(
-                            controller: emailController,
-                            hintText: 'Email',
-                            obsecureText: false,
-                            prefixIcon: Icons.email,
-                          ),
-                          const SizedBox(height: 25),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextField(
-                                controller: passwordController,
-                                obscureText: _obscurePassword,
-                                style: const TextStyle(color: Colors.white),
-                                decoration: InputDecoration(
-                                  hintText: 'Password',
-                                  hintStyle:
-                                      const TextStyle(color: Colors.white70),
-                                  prefixIcon: const Icon(Icons.lock,
-                                      color: Colors.white),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword
-                                          ? Icons.visibility
-                                          : Icons.visibility_off,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _obscurePassword = !_obscurePassword;
-                                      });
-                                    },
+                        ),
+                        const SizedBox(height: 50),
+                        MyTextField(
+                          controller: emailController,
+                          hintText: 'Email',
+                          obsecureText: false,
+                          prefixIcon: Icons.email,
+                        ),
+                        const SizedBox(height: 25),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextField(
+                              controller: passwordController,
+                              obscureText: _obscurePassword,
+                              style: const TextStyle(color: Colors.white),
+                              decoration: InputDecoration(
+                                hintText: 'Password',
+                                hintStyle:
+                                    const TextStyle(color: Colors.white70),
+                                prefixIcon:
+                                    const Icon(Icons.lock, color: Colors.white),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.white,
                                   ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        const BorderSide(color: Colors.white),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                        color: Colors.white, width: 2),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.white.withOpacity(0.2),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 15, horizontal: 20),
-                                  errorText: _passwordError,
-                                ),
-                                onChanged: (value) {
-                                  if (_passwordError != null) {
+                                  onPressed: () {
                                     setState(() {
-                                      _passwordError = null;
+                                      _obscurePassword = !_obscurePassword;
                                     });
-                                  }
-                                },
-                              ),
-                              if (_passwordError == null)
-                                const Padding(
-                                  padding:
-                                      EdgeInsets.only(top: 8.0, left: 12.0),
-                                  child: Text(
-                                    'Password must be 8-12 chars with uppercase, lowercase, number, and special char',
-                                    style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 15),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                        builder: (context) => MyForget(),
-                                      ),
-                                    );
                                   },
-                                  child: const Text(
-                                    'Forget Password',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                      decoration: TextDecoration.underline,
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide:
+                                      const BorderSide(color: Colors.white),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      color: Colors.white, width: 2),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                filled: true,
+                                fillColor: Colors.white.withOpacity(0.2),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 15, horizontal: 20),
+                                errorText: _passwordError,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        MyLogText(onPressed: _login),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              'Do you have an account?',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (context) => MySignUpPage(
+                                      email: widget.email,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          MyLogText(onPressed: _login),
-                          const SizedBox(height: 30),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Text(
-                                'Do you have an account?',
+                                );
+                              },
+                              child: const Text(
+                                'Sign Up',
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                   color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(width: 10),
-                              InkWell(
-                                onTap: () {
-                                  Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                      builder: (context) => MySignUpPage(
-                                        email: widget.email,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: const Text(
-                                  'Sign Up',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ]),
                     ),
                   ),
           ),

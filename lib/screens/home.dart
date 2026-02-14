@@ -1,4 +1,5 @@
 // ignore_for_file: unused_field, unnecessary_cast, unused_element
+import 'package:evocapp/components/FixSched/fixSched.dart';
 import 'package:flutter/material.dart';
 import 'package:evocapp/database/db_helper.dart';
 import 'package:evocapp/screens/startup.dart';
@@ -156,11 +157,12 @@ class _MyHomeState extends State<MyHome> {
               const SizedBox(height: 24),
               _buildCategoriesSection(),
               const SizedBox(height: 24),
+              _fixedSched(),
 
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Upcoming Events',
+                  'Collection Dates',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -366,6 +368,10 @@ class _MyHomeState extends State<MyHome> {
         ),
       ],
     );
+  }
+
+  Widget _fixedSched() {
+    return FixedSched();
   }
 
   Widget _buildCategoryCard(int index) {

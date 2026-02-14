@@ -103,7 +103,36 @@ class _MyScannerState extends State<MyScanner> {
                     IconButton(
                       icon: Icon(Icons.info_outline_rounded,
                           color: Colors.grey.shade800),
-                      onPressed: () {},
+                      onPressed: () {
+                        showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text("Waste List"),
+                                content: SizedBox(
+                                  height: 150,
+                                  child: Center(
+                                      child: Column(
+                                    children: [
+                                      Text('Biodegradable'),
+                                      Text(biowaste.toString()),
+                                      const SizedBox(height: 10),
+                                      Text('Non-Biodegradable'),
+                                      Text(nonbiowaste.toString()),
+                                    ],
+                                  )),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: Text("Close"),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  )
+                                ],
+                              );
+                            });
+                      },
                     ),
                   ],
                 ),
@@ -198,54 +227,14 @@ class _MyScannerState extends State<MyScanner> {
                   Center(
                     child: Column(
                       children: [
-                        Text('Supported categories: 6 waste types',
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            )),
-                        GestureDetector(
-                          onTap: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text("Waste List"),
-                                    content: SizedBox(
-                                      height: 150,
-                                      child: Center(
-                                          child: Column(
-                                        children: [
-                                          Text('Biodegradable'),
-                                          Text(biowaste.toString()),
-                                          const SizedBox(height: 10),
-                                          Text('Non-Biodegradable'),
-                                          Text(nonbiowaste.toString()),
-                                        ],
-                                      )),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        child: Text("Close"),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      )
-                                    ],
-                                  );
-                                });
-                          },
-                          child: ClipRect(
-                            child: Text(
-                              'View',
-                              style: TextStyle(
-                                color: Colors.blue,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
+                        Text(
+                          'Supported categories: 6 waste types',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
                           ),
-                        )
+                        ),
                       ],
                     ),
                   )
