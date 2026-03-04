@@ -7,7 +7,7 @@ class CollectionSchedulePage extends StatelessWidget {
 
   Future<List<Map<String, dynamic>>> fetchCollectionSchedules() async {
     final response = await http.get(
-      Uri.parse('http://localhost:5001/api/collection'),
+      Uri.parse('https://evoc-backends.onrender.com/api/collection'),
       headers: {'Content-Type': 'application/json'},
     );
 

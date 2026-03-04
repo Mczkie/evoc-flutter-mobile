@@ -14,7 +14,7 @@ class _AnnouncementPageState extends State<MyAnnouncement> {
   bool _isLoading = false;
 
   // ⚠️ Change this when testing on real device (use your PC’s IP instead of localhost)
-  final String _baseUrl = 'http://localhost:5001/api/announcement';
+  final String _baseUrl = 'https://evoc-backends.onrender.com/api/announcement';
 
   @override
   void initState() {
