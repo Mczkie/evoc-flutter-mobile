@@ -62,7 +62,7 @@ class _MySignUpPageState extends State<MySignUpPage> {
 
       // Send user to Node backend
       final response = await http.post(
-        Uri.parse("https://evoc-backend-jkly.onrender.com/api/mobileuser"),
+        Uri.parse("https://evoc-backends.onrender.comapi/mobileuser"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "name": name,
