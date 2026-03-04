@@ -16,7 +16,7 @@ Future<void> syncUsers() async {
 
     // Send users to your backend
     final response = await http.post(
-      Uri.parse('http://localhost:5000/api/sync-users'),
+      Uri.parse('https://evoc-backends.onrender.com/api/sync-users'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode(users), // Send user data as JSON
     );
