@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 class MyResult extends StatefulWidget {
   final File image;
@@ -19,50 +19,90 @@ class MyResult extends StatefulWidget {
 }
 
 class _MyResultState extends State<MyResult> {
-  Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $url');
-    }
+  late VideoPlayerController _controller;
+
+  bool _isVideoInitialized = false;
+
+  late String _description;
+  late String _title;
+
+  @override
+  void initState() {
+    super.initState();
+
+    bool isBio = widget.objectType.toLowerCase() == "biodegradable";
+
+    String videoPath =
+        isBio ? "assets/videos/bio.mp4" : "assets/videos/non-bio.mp4";
+
+    _description = isBio
+        ? "Biodegradable waste can naturally decompose through microorganisms and helps create compost for the environment."
+        : "Non-biodegradable waste does not easily decompose and may remain in the environment for many years.";
+
+    _title = isBio ? "Biodegradable Waste" : "Non-Biodegradable Waste";
+
+    _controller = VideoPlayerController.asset(
+      videoPath,
+    )..initialize().then((_) {
+        setState(() {
+          _isVideoInitialized = true;
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.grey.shade50,
-              Colors.grey.shade100,
-            ],
-          ),
-        ),
+      backgroundColor: Colors.grey.shade100,
+      body: SafeArea(
         child: Column(
           children: [
+            /// APP BAR
             _buildAppBar(context),
+
+            /// BODY
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
+                    /// IMAGE
                     _buildImagePreview(),
-                    const SizedBox(height: 32),
+
+                    const SizedBox(height: 25),
+
+                    /// RESULT CARD
                     _buildResultCard(),
-                    const SizedBox(height: 24),
-                    // Display analytics info on screen
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+
+                    const SizedBox(height: 25),
+
+                    /// VIDEO
+                    _buildVideoPlayer(),
+
+                    const SizedBox(height: 25),
+
+                    /// DESCRIPTION
+                    _buildDescription(),
+
+                    const SizedBox(height: 25),
+
+                    /// TITLE
+                    _buildTitle(),
+
+                    const SizedBox(height: 25),
+
+                    /// INFOGRAPHIC
+                    _buildWasteDescription(),
+
+                    const SizedBox(height: 35),
+
+                    /// BUTTON
                     _buildActionButton(context),
                   ],
                 ),
@@ -74,35 +114,398 @@ class _MyResultState extends State<MyResult> {
     );
   }
 
+  /// APP BAR
   Widget _buildAppBar(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          children: [
-            IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 15,
+        vertical: 10,
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+            ),
+          ),
+          const SizedBox(width: 10),
+          const Text(
+            "Scan Result",
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// IMAGE PREVIEW
+  Widget _buildImagePreview() {
+    return Container(
+      width: 280,
+      height: 280,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.1),
+            blurRadius: 15,
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: Image.file(
+          widget.image,
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  /// RESULT CARD
+  Widget _buildResultCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 10,
+          )
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Waste Type",
+                  style: TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  widget.objectType,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            _getTypeIcon(widget.objectType),
+            color: _getTypeColor(widget.objectType),
+            size: 35,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// VIDEO PLAYER
+  Widget _buildVideoPlayer() {
+    if (!_isVideoInitialized) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    return Column(
+      children: [
+        const Text(
+          "Learn More",
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: AspectRatio(
+            aspectRatio: _controller.value.aspectRatio,
+            child: VideoPlayer(_controller),
+          ),
+        ),
+        IconButton(
+          icon: Icon(
+            _controller.value.isPlaying
+                ? Icons.pause_circle
+                : Icons.play_circle,
+            size: 40,
+            color: Colors.green,
+          ),
+          onPressed: () {
+            setState(() {
+              _controller.value.isPlaying
+                  ? _controller.pause()
+                  : _controller.play();
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  /// DESCRIPTION
+  Widget _buildDescription() {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Text(
+        _description,
+        style: const TextStyle(
+          fontSize: 16,
+          height: 1.5,
+        ),
+        textAlign: TextAlign.justify,
+      ),
+    );
+  }
+
+  /// TITLE
+  Widget _buildTitle() {
+    return Text(
+      _title,
+      style: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+      ),
+    );
+  }
+
+  /// INFOGRAPHIC CONTENT
+  Widget _buildWasteDescription() {
+    bool isBio = widget.objectType.toLowerCase() == "biodegradable";
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.05),
+            blurRadius: 12,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// HEADER
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  color: isBio
+                      ? Colors.green.withOpacity(.15)
+                      : Colors.red.withOpacity(.15),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.arrow_back_ios_new_rounded,
-                    size: 20, color: Colors.grey.shade800),
+                child: Icon(
+                  isBio ? Icons.eco : Icons.delete,
+                  color: isBio ? Colors.green : Colors.red,
+                  size: 30,
+                ),
               ),
-              onPressed: () => Navigator.pop(context),
+              const SizedBox(width: 15),
+              Expanded(
+                child: Text(
+                  isBio
+                      ? "Biodegradable Waste Guide"
+                      : "Non-Biodegradable Waste Guide",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 25),
+
+          /// WHERE TO PUT
+          _buildInfoSection(
+            title: "Where to Put",
+            icon: Icons.check_circle,
+            color: Colors.green,
+            items: isBio
+                ? [
+                    "Compost Bin",
+                    "Green Waste Bin",
+                    "Garden Compost Area",
+                  ]
+                : [
+                    "Recycling Bin",
+                    "Plastic Collection Bin",
+                    "E-Waste Collection Area",
+                  ],
+          ),
+
+          const SizedBox(height: 20),
+
+          /// EXAMPLES
+          _buildInfoSection(
+            title: "Examples",
+            icon: Icons.recycling,
+            color: Colors.blue,
+            items: isBio
+                ? [
+                    "Food Scraps",
+                    "Fruit Peels",
+                    "Vegetables",
+                    "Paper",
+                    "Leaves",
+                  ]
+                : [
+                    "Plastic Bottles",
+                    "Glass",
+                    "Cans",
+                    "Styrofoam",
+                    "Electronics",
+                  ],
+          ),
+
+          const SizedBox(height: 20),
+
+          /// DO NOT PUT
+          _buildInfoSection(
+            title: "Do Not Put",
+            icon: Icons.cancel,
+            color: Colors.red,
+            items: isBio
+                ? [
+                    "Plastic",
+                    "Glass",
+                    "Metal",
+                    "Batteries",
+                  ]
+                : [
+                    "Food Waste",
+                    "Wet Garbage",
+                    "Leaves",
+                    "Organic Waste",
+                  ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// INFO SECTION
+  Widget _buildInfoSection({
+    required String title,
+    required IconData icon,
+    required Color color,
+    required List<String> items,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              icon,
+              color: color,
             ),
-            const SizedBox(width: 16),
-            Text('Scan Result',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade900,
-                )),
-            const Spacer(),
-            IconButton(
-              icon: Icon(Icons.share_rounded, color: Colors.grey.shade800),
-              onPressed: () {},
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        ...items.map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: color,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    item,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// BUTTON
+  Widget _buildActionButton(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          vertical: 18,
+          horizontal: 35,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.recycling,
+              color: Colors.white,
+            ),
+            SizedBox(width: 10),
+            Text(
+              "New Scan",
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ],
         ),
@@ -110,241 +513,31 @@ class _MyResultState extends State<MyResult> {
     );
   }
 
-  Widget _buildImagePreview() {
-    return FutureBuilder<File>(
-      future: Future.value(widget.image),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return _buildImagePlaceholder();
-        }
-        if (snapshot.hasError || !snapshot.hasData) {
-          return _buildImageError();
-        }
-        return _buildImageContent(snapshot.data!);
-      },
-    );
-  }
-
-  Widget _buildImageContent(File imageFile) {
-    return Container(
-      width: 280,
-      height: 280,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 16,
-            spreadRadius: 4,
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Image.file(
-          imageFile,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => _buildImageError(),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImagePlaceholder() {
-    return Container(
-      width: 280,
-      height: 280,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Center(
-        child: CircularProgressIndicator(
-          color: Colors.grey.shade400,
-          strokeWidth: 2,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildImageError() {
-    return Container(
-      width: 280,
-      height: 280,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(24),
-      ),
-      child: Center(
-        child: Icon(
-          Icons.broken_image_rounded,
-          size: 48,
-          color: Colors.grey.shade400,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildResultCard() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 16,
-            spreadRadius: 4,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // keep text aligned left
-        children: [
-          const SizedBox(height: 16),
-          _buildResultItem('Waste Type', widget.objectType),
-
-          const SizedBox(height: 16),
-
-          // 👇 Show clickable link depending on object type
-          if (widget.objectType.toLowerCase() == 'biodegradable')
-            GestureDetector(
-              onTap: () => _launchURL(
-                  'https://www.youtube.com/watch?v=VIDEO_ID_FOR_BIO'),
-              child: const Text(
-                "Learn more about Biodegradable Waste",
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            )
-          else if (widget.objectType.toLowerCase() == 'non-biodegradable')
-            GestureDetector(
-              onTap: () => _launchURL(
-                  'https://www.youtube.com/watch?v=VIDEO_ID_FOR_NONBIO'),
-              child: const Text(
-                "Learn more about Non-Biodegradable Waste",
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 16,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildResultItem(String title, String value) {
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title,
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  )),
-              const SizedBox(height: 4),
-              Text(value,
-                  style: TextStyle(
-                    color: Colors.grey.shade900,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  )),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: _getTypeColor(widget.objectType).withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(
-            _getTypeIcon(widget.objectType),
-            color: _getTypeColor(widget.objectType),
-            size: 24,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildActionButton(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: () => Navigator.pop(context),
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 32),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Colors.blue.shade600,
-                Colors.blue.shade400,
-              ],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue.shade200,
-                blurRadius: 16,
-                spreadRadius: 4,
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.recycling_rounded, color: Colors.white),
-              const SizedBox(width: 12),
-              const Text(
-                'New Scan',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
+  /// COLOR
   Color _getTypeColor(String type) {
     switch (type.toLowerCase()) {
-      case 'non-biodegradable':
-        return Colors.red.shade600;
-      case 'biodegradable':
-        return Colors.green.shade600;
-      case 'general waste':
-        return Colors.orange.shade600;
+      case "biodegradable":
+        return Colors.green;
+
+      case "non-biodegradable":
+        return Colors.red;
+
       default:
-        return Colors.grey.shade600;
+        return Colors.grey;
     }
   }
 
+  /// ICON
   IconData _getTypeIcon(String type) {
     switch (type.toLowerCase()) {
-      case 'non-biodegradable':
-        return Icons.do_not_disturb_on_total_silence_rounded;
-      case 'biodegradable':
-        return Icons.eco_rounded;
-      case 'general waste':
-        return Icons.delete_outline_rounded;
+      case "biodegradable":
+        return Icons.eco;
+
+      case "non-biodegradable":
+        return Icons.delete;
+
       default:
-        return Icons.help_outline_rounded;
+        return Icons.help;
     }
   }
 }

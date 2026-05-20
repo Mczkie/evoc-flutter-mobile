@@ -68,6 +68,9 @@ dependencies:
   cloud_firestore: ^5.6.10
   youtube_player_flutter: ^9.1.2
   url_launcher: ^6.3.2
+  video_player: ^2.10.1
+  flutter_local_notifications: ^17.1.0
+  dropdown_flutter: ^1.0.3
   
 
 dev_dependencies:
@@ -118,6 +121,14 @@ flutter:
     - assets/paper_184.jpg
     - assets/plastic_076.jpg
     - assets/trash_005.jpg
+    - assets/waste_segregation.mp4
+    - images/Logins.json
+    - assets/success.json
+    - assets/normal.mp4
+    - images/successpic.gif
+    - images/studentHome/
+    - assets/videos/
+    - assets/splash_screen/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

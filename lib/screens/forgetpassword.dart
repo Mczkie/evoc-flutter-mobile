@@ -33,7 +33,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   // ✅ Password Validation Function
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) return "Enter a password";
-    if (value.length < 6) return "Password must be at least 6 characters";
+    if (value.length < 8) return "Password must be at least 8 characters";
     if (!RegExp(r'[A-Z]').hasMatch(value))
       return "Must contain an uppercase letter";
     if (!RegExp(r'[0-9]').hasMatch(value)) return "Must contain a number";

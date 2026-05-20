@@ -1,8 +1,8 @@
 import 'package:evocapp/menu.dart';
-import 'package:evocapp/screens/home.dart';
+import 'package:evocapp/screens/user_screen/normaluserpage/normaluserhome.dart';
 // import 'package:evocapp/screens/loginpage.dart';
 import 'package:evocapp/screens/announcement.dart';
-import 'package:evocapp/screens/tips.dart';
+import 'package:evocapp/screens/user_screen/studentpages/tips/tips.dart';
 import 'package:evocapp/screens/scanner.dart';
 import 'package:flutter/material.dart';
 
@@ -29,8 +29,9 @@ class _MyHomePageState extends State<MyHomePage> {
     // Initialize your widgets here
     await Future.delayed(const Duration(seconds: 1)); // Simulate async work
     return [
-      MyHome(email: widget.email),
+      Normaluserhome(),
       const MyTips(),
+      MyScanner(),
       const MyAnnouncement(),
       MyMenu(
         email: widget.email,
@@ -62,17 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: <Widget>[
                       const SizedBox(
                           height: 8.0), // Space above the ElevatedButton
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const MyScanner(),
-                            ),
-                          );
-                        },
-                        child: const Text('Camera'),
-                      ),
+
                       const SizedBox(
                           height:
                               8.0), // Space between ElevatedButton and BottomNavigationBar
@@ -90,6 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.green,
         currentIndex: _currentIndex,
         selectedItemColor: Colors.black,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
         onTap: (int newIndex) {
           setState(() {
             _currentIndex = newIndex;
@@ -103,6 +96,10 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.tips_and_updates, color: Colors.black),
             label: 'Tips',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.camera, color: Colors.black),
+            label: 'Scanner',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.announcement, color: Colors.black),

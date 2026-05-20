@@ -1,5 +1,5 @@
-import 'package:evocapp/screens/loginpage.dart';
 import 'package:evocapp/screens/home_page.dart';
+import 'package:evocapp/screens/setup_page/setup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:lottie/lottie.dart';
@@ -69,7 +69,7 @@ class _MyStartupState extends State<MyStartup> {
           decoration: const PageDecoration(
             titleTextStyle:
                 TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            pageColor: Colors.green,
+            pageColor: Colors.white,
           ),
         ),
         PageViewModel(
@@ -80,8 +80,22 @@ class _MyStartupState extends State<MyStartup> {
             ),
           ),
           title: "What is Eco Vista?",
-          body:
-              "Eco Vista is a application that used to track if the waste is a bio or Non-biodegradable.",
+          bodyWidget: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                "Eco Vista Olongapo City (EVOC) is an app to improve waste segregation",
+                style: TextStyle(fontSize: 17),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 220),
+              const Text(
+                "Developed By Mc Peterson Mercader and Alexandra Marie De Jesus for their thesis project in BS Computer Science at Gordon College",
+                style: TextStyle(fontSize: 12),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
           decoration: const PageDecoration(
             titleTextStyle:
                 TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -93,7 +107,7 @@ class _MyStartupState extends State<MyStartup> {
       onDone: () {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => MyLoginPage(email: ''),
+            builder: (context) => SetupPage(),
           ),
         );
       },

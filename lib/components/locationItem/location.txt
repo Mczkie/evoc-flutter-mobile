@@ -1,0 +1,18 @@
+ final List<String> locations = [
+    'East Bajac-Bajac',
+    'East Tapinac',
+    'Mabayuan',
+    'Barretto',
+    'Pag-asa',
+    'Banicain',
+    'Kalaklan',
+    'Kalalake',
+    'West Tapinac',
+    'Sta. Rita',
+    'Gordon Heights',
+    'Old Cabalan',
+    'New Cabalan',
+    'New Ilalim',
+    'West Bajac-Bajac',
+    'Asinan',
+  ];

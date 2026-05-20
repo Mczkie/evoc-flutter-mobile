@@ -23,7 +23,7 @@ class _MyScannerState extends State<MyScanner> {
   final picker = ImagePicker();
 
   List<String> biowaste = [
-    'Food wast',
+    'Food waste',
     'Garden/Plant waste',
     'Paper waste',
     'Agricultural waste',
@@ -85,22 +85,10 @@ class _MyScannerState extends State<MyScanner> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back_ios_new_rounded,
-                          color: Colors.grey.shade800),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    Text('Eco Scan',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.grey.shade900,
-                            letterSpacing: 1.1)),
-                    IconButton(
+                      alignment: Alignment.topRight,
                       icon: Icon(Icons.info_outline_rounded,
                           color: Colors.grey.shade800),
                       onPressed: () {

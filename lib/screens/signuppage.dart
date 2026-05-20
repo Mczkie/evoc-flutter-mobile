@@ -1,6 +1,6 @@
+import 'package:evocapp/components/signup/signupbutton.dart';
+import 'package:evocapp/components/textfield/textfield.dart';
 import 'package:flutter/material.dart';
-import 'package:evocapp/components/signupbutton.dart';
-import 'package:evocapp/components/textfield.dart';
 import 'package:evocapp/screens/loginpage.dart';
 import 'package:evocapp/database/db_helper.dart';
 import 'package:evocapp/utils/validators.dart';
@@ -62,7 +62,7 @@ class _MySignUpPageState extends State<MySignUpPage> {
 
       // Send user to Node backend
       final response = await http.post(
-        Uri.parse("https://evoc-backends.onrender.com/api/mobileuser"),
+        Uri.parse("https://evoc-backends.onrender.comapi/mobileuser"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "name": name,

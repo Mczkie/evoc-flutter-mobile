@@ -1,9 +1,10 @@
+import 'package:evocapp/screens/forgetpassword.dart';
 import 'package:flutter/material.dart';
 // import 'package:evocapp/screens/forgetpassword.dart';
 import 'package:evocapp/screens/home_page.dart';
 import 'package:evocapp/screens/signuppage.dart';
-import 'package:evocapp/components/logtext.dart';
-import 'package:evocapp/components/textfield.dart';
+import 'package:evocapp/components/login/logtext.dart';
+import 'package:evocapp/components/textfield/textfield.dart';
 import 'package:evocapp/database/db_helper.dart';
 import 'package:evocapp/utils/validators.dart';
 import 'package:lottie/lottie.dart';
@@ -201,6 +202,29 @@ class _MyLoginPageState extends State<MyLoginPage> {
                               ),
                             ),
                           ],
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const MyForget(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Forgot Password',
+                              style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                              textAlign: TextAlign.end,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 20),
                         MyLogText(onPressed: _login),

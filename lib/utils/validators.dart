@@ -6,8 +6,8 @@ class PasswordValidator {
     if (password.length < 8) {
       return 'Password must be at least 8 characters';
     }
-    if (password.length > 12) {
-      return 'Password must be at most 12 characters';
+    if (password.length > 20) {
+      return 'Password must be at most 20 characters';
     }
     if (!password.contains(RegExp(r'[A-Z]'))) {
       return 'Password must contain at least one uppercase letter';
