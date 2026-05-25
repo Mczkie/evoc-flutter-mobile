@@ -1,7 +1,13 @@
 // ignore_for_file: unused_field, unnecessary_cast, unused_element
 import 'package:evocapp/components/FixSched/fix_sched.dart';
 import 'package:evocapp/components/mediaplayer/media.dart';
+import 'package:evocapp/screens/user_screen/studentpages/announcement_student/announcement_student.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:evocapp/models/announcement.dart';
+import 'dart:async';
 
 // import 'package:evocapp/screens/eventDate.dart';
 
@@ -14,6 +20,7 @@ class Studenthome extends StatefulWidget {
 
 class _StudenthomeState extends State<Studenthome> {
   Map<DateTime, String> _eventDates = {};
+  List<Announcement> announcements = [];
 
   // Updated Color Palette - Eco-friendly Nature Theme
   static const Color primaryColor = Color(0xFF388E3C); // Deeper green
@@ -73,9 +80,74 @@ class _StudenthomeState extends State<Studenthome> {
     },
   ];
 
+  int unreadCount = 0;
+  int lastSeenId = 0;
+
   @override
   void initState() {
     super.initState();
+    loadLastSeen();
+    fetchUnreadCount();
+
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      fetchUnreadCount(); // refresh every 10 seconds
+    });
+  }
+
+  Future<void> loadLastSeen() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      lastSeenId = prefs.getInt("lastSeenAnnouncement") ?? 0;
+    });
+  }
+
+  Future<void> fetchUnreadCount() async {
+    try {
+      final response = await http.get(
+        Uri.parse("https://evoc-backend.onrender.com/api/announcement"),
+      );
+
+      if (response.statusCode == 200) {
+        final List data = jsonDecode(response.body);
+
+        final fetched = data.map((e) => Announcement.fromJson(e)).toList();
+
+        setState(() {
+          announcements = fetched; // 🔥 STORE IT PROPERLY
+
+          unreadCount = announcements.where((a) => a.id > lastSeenId).length;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error loading unread: $e");
+    }
+  }
+
+  Future<void> markAllAsRead() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (announcements.isNotEmpty) {
+      final latestId = announcements.first.id;
+
+      prefs.setInt(
+        "lastSeenAnnouncement",
+        announcements.first.id,
+      );
+
+      setState(() {
+        lastSeenId = latestId;
+        unreadCount = 0;
+      });
+    }
+  }
+
+  Timer? _timer;
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -93,9 +165,6 @@ class _StudenthomeState extends State<Studenthome> {
               _buildHeroSection(),
               const SizedBox(height: 24),
               // _buildSearchBar(),
-
-              Text("Welcome Students!",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
 
               _buildCategoriesSection(),
               const SizedBox(height: 24),
@@ -176,6 +245,49 @@ class _StudenthomeState extends State<Studenthome> {
           ],
         ),
       ),
+      actions: [
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.notifications_none),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AnnouncementStudent(),
+                  ),
+                );
+                await markAllAsRead();
+                await loadLastSeen();
+                await fetchUnreadCount(); // ADD THIS
+              },
+            ),
+
+            // ONLY ONE BADGE
+            if (unreadCount > 0)
+              Positioned(
+                right: 6,
+                top: 6,
+                child: Container(
+                  padding: const EdgeInsets.all(5),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    unreadCount > 9 ? "9+" : "$unreadCount",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ],
     );
   }
 

@@ -13,9 +13,6 @@ class MyPrivacy extends StatefulWidget {
 class _PrivacySettingsPageState extends State<MyPrivacy> {
   // State variables for privacy settings
   bool _locationAccess = false;
-  bool _dataSharing = true;
-  bool _adPersonalization = false;
-  bool _accountVisibility = true;
 
   // Location object for handling location services
   Location location = Location();
@@ -107,27 +104,6 @@ class _PrivacySettingsPageState extends State<MyPrivacy> {
             subtitle: "Allow app to access your location",
             value: _locationAccess,
             onChanged: _toggleLocationAccess,
-          ),
-          // Data Sharing Switch
-          _buildSwitchTile(
-            title: "Data Sharing",
-            subtitle: "Share usage data for improvements",
-            value: _dataSharing,
-            onChanged: (val) => setState(() => _dataSharing = val),
-          ),
-          // Ad Personalization Switch
-          _buildSwitchTile(
-            title: "Ad Personalization",
-            subtitle: "Use data for better ad suggestions",
-            value: _adPersonalization,
-            onChanged: (val) => setState(() => _adPersonalization = val),
-          ),
-          // Account Visibility Switch
-          _buildSwitchTile(
-            title: "Account Visibility",
-            subtitle: "Allow others to find you",
-            value: _accountVisibility,
-            onChanged: (val) => setState(() => _accountVisibility = val),
           ),
         ],
       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:video_player/video_player.dart';
 
 class MyTips extends StatelessWidget {
   const MyTips({super.key});
@@ -24,9 +23,7 @@ class MyTips extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.green,
         centerTitle: true,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "Student Education",
           style: TextStyle(
@@ -49,10 +46,7 @@ class MyTips extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25),
                   gradient: LinearGradient(
-                    colors: [
-                      Colors.green.shade700,
-                      Colors.green.shade400,
-                    ],
+                    colors: [Colors.green.shade700, Colors.green.shade400],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -85,7 +79,7 @@ class MyTips extends StatelessWidget {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "Educational content for students about waste segregation, recycling, and environmental awareness.",
+                          "Educational content about waste segregation, recycling, and environmental awareness.",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -100,15 +94,6 @@ class MyTips extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              /// EDUCATIONAL POLICY
-              _buildPolicyCard(
-                "DM No. 268, s. 2023 – STRICT IMPLEMENTATION OF NO SEGREGATION, NO COLLECTION OF GARBAGE POLICY WITHIN OLONGAPO CITY",
-                "https://deped-olongapo.com/dm-no-268-s-2023-strict-emplementation-of-no-segregation-no-collection-of-garbage-policy-within-olongapo-city/",
-                _launchURL,
-              ),
-
-              const SizedBox(height: 10),
-
               /// SECTION TITLE
               const Text(
                 "Educational Topics",
@@ -118,55 +103,67 @@ class MyTips extends StatelessWidget {
                 ),
               ),
 
+              _buildPolicyCard(
+                "DM No. 268, s. 2023 – STRICT IMPLEMENTATION OF NO SEGREGATION, NO COLLECTION OF GARBAGE POLICY WITHIN OLONGAPO CITY",
+                "https://deped-olongapo.com/dm-no-268-s-2023-strict-emplementation-of-no-segregation-no-collection-of-garbage-policy-within-olongapo-city/",
+                _launchURL,
+              ),
+
               const SizedBox(height: 15),
 
-              /// EDUCATIONAL CONTENTS
+              /// CARDS
               _buildTipCard(
+                context,
                 Icons.recycling,
                 "What is Waste Segregation?",
-                "Waste segregation is the process of separating biodegradable and non-biodegradable waste to reduce pollution and improve recycling efficiency.",
+                "Learn how to properly separate biodegradable and non-biodegradable waste to reduce pollution and improve recycling.\n\nCTTO: National Geographic",
                 Colors.green,
-                "assets/videos/Video-1.mp4",
+                "https://www.youtube.com/watch?v=0ZiY6kYReGQ",
               ),
 
               _buildTipCard(
+                context,
                 Icons.delete,
                 "Proper Disposal",
-                "Always throw waste into the correct bins to maintain cleanliness and protect the environment.",
+                "Proper disposal keeps communities clean and safe from diseases.\n\nCTTO: WHO",
                 Colors.orange,
-                "assets/videos/Video-2.mp4",
+                "https://www.youtube.com/watch?v=IMoRFY6hN5Q",
               ),
 
               _buildTipCard(
+                context,
                 Icons.eco,
                 "Environmental Awareness",
-                "Students can help the environment by practicing proper waste management and reducing plastic use.",
+                "Small actions like reducing plastic use can greatly help the environment.\n\nCTTO: TED-Ed",
                 Colors.teal,
-                "assets/videos/Video-3.mp4",
+                "https://www.youtube.com/watch?v=QQYgCxu988s",
               ),
 
               _buildTipCard(
+                context,
                 Icons.clean_hands,
                 "Clean Surroundings",
-                "Keeping your surroundings clean helps prevent diseases and keeps communities safe.",
+                "Clean surroundings prevent diseases and create safer communities.\n\nCTTO: UNICEF",
                 Colors.blue,
-                "assets/videos/Video-5.mp4",
+                "https://www.youtube.com/watch?v=zkqunQY2TnU",
               ),
 
               _buildTipCard(
+                context,
                 Icons.shopping_bag,
                 "Reduce Plastic Usage",
-                "Use reusable bags, tumblers, and eco-friendly materials instead of single-use plastics.",
+                "Use reusable bags and avoid single-use plastics.\n\nCTTO: WWF",
                 Colors.purple,
-                "assets/videos/Video-6.mp4",
+                "https://www.youtube.com/watch?v=ODni_Bey154",
               ),
 
               _buildTipCard(
+                context,
                 Icons.school,
                 "Student Responsibility",
-                "Students play an important role in protecting nature by becoming responsible and environmentally aware citizens.",
+                "Students play a big role in protecting the environment.\n\nCTTO: Environmental Education",
                 Colors.red,
-                "assets/videos/Video-7.mp4",
+                "https://www.youtube.com/watch?v=7V8oFI4GYMY",
               ),
             ],
           ),
@@ -174,188 +171,129 @@ class MyTips extends StatelessWidget {
       ),
     );
   }
-}
 
-/// POLICY CARD
-Widget _buildPolicyCard(
-  String text,
-  String url,
-  Function(String) launchURL,
-) {
-  return Card(
-    elevation: 2,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(18),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.gavel,
-              color: Colors.green,
-            ),
-          ),
-          const SizedBox(width: 15),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => launchURL(url),
-              child: Text(
-                text,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ),
-        ],
+  // Policy Card
+  Widget _buildPolicyCard(
+    String title,
+    String url,
+    Function(String) launchURL,
+  ) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
       ),
-    ),
-  );
-}
-
-/// EDUCATIONAL CARD
-Widget _buildTipCard(
-  IconData icon,
-  String title,
-  String description,
-  Color color,
-  String videoPath,
-) {
-  return Card(
-    margin: const EdgeInsets.only(bottom: 16),
-    elevation: 3,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: InkWell(
+        onTap: () => launchURL(url),
+        borderRadius: BorderRadius.circular(18),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.1),
+                  color: Colors.green.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon,
-                  color: color,
+                child: const Icon(
+                  Icons.description,
+                  color: Colors.green,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
                   ),
                 ),
               ),
+              const Icon(Icons.open_in_new, size: 18),
             ],
           ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            style: const TextStyle(
-              height: 1.5,
-              fontSize: 15,
-            ),
-            textAlign: TextAlign.justify,
-          ),
-          const SizedBox(height: 15),
-          AssetVideoPlayer(
-            videoPath: videoPath,
-          ),
-        ],
+        ),
       ),
-    ),
-  );
-}
-
-/// VIDEO PLAYER
-class AssetVideoPlayer extends StatefulWidget {
-  final String videoPath;
-
-  const AssetVideoPlayer({
-    super.key,
-    required this.videoPath,
-  });
-
-  @override
-  State<AssetVideoPlayer> createState() => _AssetVideoPlayerState();
-}
-
-class _AssetVideoPlayerState extends State<AssetVideoPlayer> {
-  late VideoPlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = VideoPlayerController.asset(
-      widget.videoPath,
-    )..initialize().then((_) {
-        setState(() {});
-      });
+    );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  /// TIP CARD
+  Widget _buildTipCard(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String description,
+    Color color,
+    String youtubeUrl,
+  ) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: color),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
-  @override
-  Widget build(BuildContext context) {
-    if (!_controller.value.isInitialized) {
-      return const SizedBox(
-        height: 200,
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
+            const SizedBox(height: 12),
 
-    return Column(
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(15),
-          child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
-          ),
+            Text(
+              description,
+              style: const TextStyle(
+                fontSize: 15,
+                height: 1.5,
+              ),
+              textAlign: TextAlign.justify,
+            ),
+
+            const SizedBox(height: 12),
+
+            /// YOUTUBE BUTTON
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: color,
+              ),
+              icon: const Icon(Icons.play_circle, color: Colors.white),
+              label: const Text(
+                "Watch Video",
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () async {
+                final uri = Uri.parse(youtubeUrl);
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
+              },
+            ),
+          ],
         ),
-        IconButton(
-          icon: Icon(
-            _controller.value.isPlaying
-                ? Icons.pause_circle
-                : Icons.play_circle,
-            size: 35,
-            color: Colors.green,
-          ),
-          onPressed: () {
-            setState(() {
-              _controller.value.isPlaying
-                  ? _controller.pause()
-                  : _controller.play();
-            });
-          },
-        ),
-      ],
+      ),
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:evocapp/screens/menu_pages/privacySettingsPage.dart';
 import 'package:flutter/material.dart';
 import 'package:evocapp/database/db_helper.dart';
 import 'package:evocapp/screens/loginpage.dart';
+import 'package:flutter/services.dart';
 
 class MyMenu extends StatelessWidget {
   const MyMenu({super.key, required this.email});
@@ -37,7 +38,7 @@ class MyMenu extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: ElevatedButton(
               onPressed: () {
-                _logout(context);
+                SystemNavigator.pop();
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green, // Button color
@@ -45,7 +46,7 @@ class MyMenu extends StatelessWidget {
                     const EdgeInsets.symmetric(vertical: 16), // Button padding
               ),
               child: const Text(
-                'Logout',
+                'Close Application',
                 style:
                     TextStyle(fontSize: 16, color: Colors.white), // Text style
               ),

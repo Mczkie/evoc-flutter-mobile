@@ -14,8 +14,6 @@ class MyNotificationS extends StatefulWidget {
 
 class _NotificationSettingsPageState extends State<MyNotificationS> {
   bool _pushNotifications = true;
-  bool _emailNotifications = false;
-  bool _smsNotifications = false;
   bool _appUpdates = true;
 
   @override
@@ -29,8 +27,6 @@ class _NotificationSettingsPageState extends State<MyNotificationS> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _pushNotifications = prefs.getBool("push_notifications") ?? true;
-      _emailNotifications = prefs.getBool("email_notifications") ?? false;
-      _smsNotifications = prefs.getBool("sms_notifications") ?? false;
       _appUpdates = prefs.getBool("app_updates") ?? true;
     });
   }
@@ -42,8 +38,6 @@ class _NotificationSettingsPageState extends State<MyNotificationS> {
 
     setState(() {
       if (key == "push_notifications") _pushNotifications = value;
-      if (key == "email_notifications") _emailNotifications = value;
-      if (key == "sms_notifications") _smsNotifications = value;
       if (key == "app_updates") _appUpdates = value;
     });
   }
@@ -82,18 +76,6 @@ class _NotificationSettingsPageState extends State<MyNotificationS> {
             subtitle: "Receive app notifications",
             value: _pushNotifications,
             onChanged: (val) => _toggleSetting("push_notifications", val),
-          ),
-          _buildSwitchTile(
-            title: "Email Notifications",
-            subtitle: "Get updates via email",
-            value: _emailNotifications,
-            onChanged: (val) => _toggleSetting("email_notifications", val),
-          ),
-          _buildSwitchTile(
-            title: "SMS Notifications",
-            subtitle: "Receive alerts through SMS",
-            value: _smsNotifications,
-            onChanged: (val) => _toggleSetting("sms_notifications", val),
           ),
           _buildSwitchTile(
             title: "App Updates",

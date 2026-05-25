@@ -1,4 +1,5 @@
-import 'package:evocapp/screens/home_page.dart';
+import 'package:evocapp/screens/user_screen/student_screen.dart';
+
 import 'package:flutter/material.dart';
 
 void main() {
@@ -39,8 +40,10 @@ class LegalInformationScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => MyHomePage(email: ''))),
+          onPressed: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const StudentScreen()),
+          ),
         ),
       ),
       body: Container(

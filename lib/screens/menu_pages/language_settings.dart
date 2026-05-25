@@ -1,7 +1,6 @@
 import 'package:evocapp/l10n/app_localization.dart';
 
 import 'package:evocapp/providers/localeProvider.dart';
-import 'package:evocapp/screens/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -25,11 +24,6 @@ class _MyLanguageState extends State<MyLanguage> {
         centerTitle: true,
         backgroundColor: Colors.green,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => MyHomePage(email: ''))),
-        ),
       ),
       body: Container(
         decoration: const BoxDecoration(
